@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>NEET Mock · Biotechnology</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg:        #0a0a0a;
+    --surface:   #111111;
+    --surface2:  #181818;
+    --surface3:  #1e1e1e;
+    --border:    #242424;
+    --border2:   #2e2e2e;
+    --text:      #e8e8e8;
+    --text2:     #888888;
+    --text3:     #555555;
+    --green:     #4ade80;
+    --green-dim: #1a3a25;
+    --blue:      #60a5fa;
+    --blue-dim:  #1a2a3a;
+    --amber:     #fbbf24;
+    --amber-dim: #2a2010;
+    --red:       #f87171;
+    --red-dim:   #2a1515;
+  }
+
+  *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+  html {
+    height: 100%;
+    height: -webkit-fill-available;
+  }
+
+  body {
+    height: 100%;
+    height: 100dvh;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    line-height: 1.6;
+    overflow: hidden;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    height: calc(52px + env(safe-area-inset-top, 0px));
+    padding-top: env(safe-area-inset-top, 0px);
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 20px;
+    padding-right: 20px;
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 50;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+    flex: 1;
+    overflow: hidden;
+  }
+
+  .neet-pill {
+    background: var(--surface3);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    padding: 3px 8px;
+    border-radius: 4px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+
+  .exam-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .exam-title .sub { color: var(--text3); font-weight: 400; }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-shrink: 0;
+  }
+
+  #timer {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+
+  #timer.warn   { color: var(--amber); }
+  #timer.danger { color: var(--red); animation: blink 1s infinite; }
+  @keyframes blink { 50% { opacity: 0.35; } }
+
+  /* nav-toggle only visible on mobile */
+  .nav-toggle {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 6px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    cursor: pointer;
+    gap: 3px;
+    flex-direction: column;
+    flex-shrink: 0;
+  }
+
+  .nav-toggle span {
+    display: block;
+    width: 14px;
+    height: 1.5px;
+    background: var(--text2);
+    border-radius: 2px;
+    transition: background 0.15s;
+  }
+
+  .nav-toggle:hover span { background: var(--text); }
+
+  /* ─── DESKTOP LAYOUT ─── */
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 260px;
+    height: calc(100dvh - 52px - env(safe-area-inset-top, 0px));
+    margin-top: calc(52px + env(safe-area-inset-top, 0px));
+  }
+
+  /* ─── QUESTION PANEL ─── */
+  .q-panel {
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+    min-width: 0;
+  }
+
+  .q-scroll {
+    flex: 1;
+    overflow-y: auto;
+    padding: 28px 36px 16px;
+  }
+
+  .q-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 18px;
+  }
+
+  .q-counter {
+    font-size: 11px;
+    color: var(--text3);
+    font-weight: 500;
+    letter-spacing: 0.5px;
+  }
+
+  .dot { color: var(--border2); }
+
+  .mark-tag {
+    font-size: 10px;
+    font-weight: 600;
+    padding: 2px 6px;
+    border-radius: 3px;
+  }
+
+  .mark-pos { background: var(--green-dim); color: var(--green); }
+  .mark-neg { background: var(--red-dim);   color: var(--red); }
+
+  .q-text {
+    font-size: 15px;
+    line-height: 1.75;
+    color: var(--text);
+    margin-bottom: 24px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .options-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+  }
+
+  .opt {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 14px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+    background: transparent;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .opt:hover    { border-color: var(--border2); background: var(--surface); }
+  .opt.selected { border-color: var(--blue);  background: var(--blue-dim); }
+  .opt.correct  { border-color: var(--green); background: var(--green-dim); }
+  .opt.wrong    { border-color: var(--red);   background: var(--red-dim); }
+
+  .opt-key {
+    width: 22px; height: 22px; min-width: 22px;
+    border-radius: 50%;
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 600;
+    color: var(--text3);
+    transition: all 0.15s;
+    margin-top: 2px;
+  }
+
+  .opt.selected .opt-key { background: var(--blue);  border-color: var(--blue);  color: #000; }
+  .opt.correct  .opt-key { background: var(--green); border-color: var(--green); color: #000; }
+  .opt.wrong    .opt-key { background: var(--red);   border-color: var(--red);   color: #fff; }
+
+  .opt-text { font-size: 14px; line-height: 1.5; color: var(--text); padding-top: 2px; }
+
+  .exp-box {
+    display: none;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-left: 2px solid var(--green);
+    border-radius: 6px;
+    padding: 12px 14px;
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.7;
+    margin-bottom: 16px;
+  }
+  .exp-box.show { display: block; }
+
+  /* ─── FOOTER BUTTONS ─── */
+  .q-footer {
+    padding: 12px 20px;
+    padding-bottom: calc(12px + env(safe-area-inset-bottom, 0px));
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .btn {
+    padding: 8px 16px;
+    border-radius: 6px;
+    border: 1px solid transparent;
+    font-family: 'Inter', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+    white-space: nowrap;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .btn-ghost  { background: transparent; border-color: var(--border2); color: var(--text2); }
+  .btn-ghost:hover { border-color: var(--text3); color: var(--text); }
+
+  .btn-amber  { background: transparent; border-color: var(--amber); color: var(--amber); }
+  .btn-amber:hover { background: var(--amber-dim); }
+
+  .btn-blue   { background: var(--blue); border-color: var(--blue); color: #000; font-weight: 600; }
+  .btn-blue:hover { opacity: 0.85; }
+
+  .spacer { flex: 1; }
+
+  .btn-submit { background: var(--surface3); border-color: var(--border2); color: var(--text2); }
+  .btn-submit:hover { border-color: var(--green); color: var(--green); }
+
+  /* ─── SIDEBAR (desktop) ─── */
+  .sidebar {
+    background: var(--surface);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  .sb-head {
+    padding: 16px 16px 10px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .sb-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+  }
+
+  /* close btn only on mobile */
+  .sb-close {
+    display: none;
+    width: 28px; height: 28px;
+    align-items: center; justify-content: center;
+    border-radius: 5px;
+    border: 1px solid var(--border2);
+    background: var(--surface2);
+    color: var(--text2);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+  }
+
+  .legend {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 5px 8px;
+    padding: 10px 16px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .leg-item {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 11px; color: var(--text3);
+  }
+
+  .leg-dot { width: 7px; height: 7px; border-radius: 2px; flex-shrink: 0; }
+  .ld-green { background: var(--green); }
+  .ld-amber { background: var(--amber); }
+  .ld-blue  { background: var(--blue); }
+  .ld-muted { background: var(--border2); }
+
+  .q-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 6px;
+    padding: 12px 16px;
+    overflow-y: auto;
+    flex: 1;
+  }
+
+  .qb {
+    aspect-ratio: 1;
+    border-radius: 5px;
+    border: 1px solid var(--border);
+    background: var(--surface2);
+    color: var(--text3);
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: all 0.12s;
+    font-family: 'JetBrains Mono', monospace;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .qb:hover    { border-color: var(--border2); color: var(--text2); }
+  .qb.current  { border-color: var(--blue);  background: var(--blue-dim);  color: var(--blue); }
+  .qb.answered { border-color: var(--green); background: var(--green-dim); color: var(--green); }
+  .qb.skipped  { border-color: var(--amber); background: var(--amber-dim); color: var(--amber); }
+
+  .sb-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1px;
+    border-top: 1px solid var(--border);
+    background: var(--border);
+  }
+
+  .stat { background: var(--surface); padding: 10px 6px; text-align: center; }
+
+  .stat-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 17px;
+    font-weight: 400;
+    margin-bottom: 1px;
+  }
+
+  .stat-lbl { font-size: 9px; color: var(--text3); letter-spacing: 0.5px; text-transform: uppercase; }
+
+  .sv-green { color: var(--green); }
+  .sv-amber { color: var(--amber); }
+  .sv-blue  { color: var(--blue); }
+
+  /* ─── SCROLLBAR ─── */
+  ::-webkit-scrollbar { width: 3px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 2px; }
+
+  /* ─── RESULT SCREEN ─── */
+  #result-screen {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: var(--bg);
+    z-index: 200;
+    overflow-y: auto;
+    padding: 40px 16px 60px;
+  }
+
+  .res-wrap { max-width: 640px; margin: 0 auto; }
+
+  .res-top { text-align: center; margin-bottom: 36px; }
+
+  .res-eyebrow {
+    font-size: 10px; letter-spacing: 3px; text-transform: uppercase;
+    color: var(--text3); margin-bottom: 10px;
+  }
+
+  .res-score-big {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(48px, 12vw, 72px);
+    font-weight: 400; color: var(--text); line-height: 1; margin-bottom: 6px;
+  }
+
+  .res-score-label { font-size: 12px; color: var(--text3); letter-spacing: 1px; }
+
+  .res-cards {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--border);
+    border: 1px solid var(--border); border-radius: 10px;
+    overflow: hidden; margin-bottom: 36px;
+  }
+
+  .res-card { background: var(--surface); padding: 18px 12px; text-align: center; }
+
+  .rc-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: clamp(22px, 6vw, 28px);
+    font-weight: 400; margin-bottom: 4px;
+  }
+
+  .rc-lbl { font-size: 10px; color: var(--text3); letter-spacing: 1px; text-transform: uppercase; }
+  .rc-green { color: var(--green); }
+  .rc-red   { color: var(--red); }
+  .rc-amber { color: var(--amber); }
+
+  .res-sol-title {
+    font-size: 10px; letter-spacing: 2px; text-transform: uppercase;
+    color: var(--text3); margin-bottom: 14px; padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .sol-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 16px; margin-bottom: 10px;
+  }
+
+  .sol-item.sc { border-left: 2px solid var(--green); }
+  .sol-item.sw { border-left: 2px solid var(--red); }
+  .sol-item.ss { border-left: 2px solid var(--amber); }
+
+  .sol-num {
+    font-size: 10px; font-weight: 600; letter-spacing: 1.5px;
+    text-transform: uppercase; color: var(--text3); margin-bottom: 6px;
+  }
+
+  .sol-qtext { font-size: 13px; color: var(--text2); line-height: 1.6; margin-bottom: 10px; }
+
+  .sol-tags { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 8px; }
+
+  .stag { font-size: 11px; font-weight: 500; padding: 3px 8px; border-radius: 4px; }
+  .stag-c { background: var(--green-dim); color: var(--green); }
+  .stag-w { background: var(--red-dim);   color: var(--red); }
+  .stag-s { background: var(--amber-dim); color: var(--amber); }
+
+  .sol-exp {
+    font-size: 12px; color: var(--text3); line-height: 1.7;
+    padding-top: 8px; border-top: 1px solid var(--border);
+  }
+
+  .btn-restart {
+    width: 100%; padding: 13px; margin-top: 28px;
+    background: var(--surface2); border: 1px solid var(--border2);
+    border-radius: 8px; color: var(--text2);
+    font-family: 'Inter', sans-serif; font-size: 13px; font-weight: 500;
+    cursor: pointer; letter-spacing: 0.5px; transition: all 0.15s;
+  }
+  .btn-restart:hover { border-color: var(--green); color: var(--green); }
+
+  /* ═══════════════════════════════════════
+     MOBILE  (≤ 700px)
+  ═══════════════════════════════════════ */
+  @media (max-width: 700px) {
+
+    body { overflow: hidden; }
+
+    /* Header adjustments */
+    .header { padding: 0 14px; }
+    .exam-title .sub { display: none; }
+    .nav-toggle { display: flex; }
+
+    /* Single column — sidebar hidden by default */
+    .layout {
+      grid-template-columns: 1fr;
+      height: calc(100dvh - 52px - env(safe-area-inset-top, 0px));
+    }
+
+    .q-panel { border-right: none; }
+
+    .q-scroll { padding: 20px 18px 12px; }
+
+    .q-text { font-size: 14px; }
+    .opt-text { font-size: 13px; }
+
+    .q-footer {
+      padding: 10px 14px;
+      padding-bottom: calc(10px + env(safe-area-inset-bottom, 8px));
+      gap: 7px;
+    }
+
+    .btn { padding: 8px 12px; font-size: 12px; }
+
+    /* Sidebar becomes a bottom-sheet drawer */
+    .sidebar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 72dvh;
+      padding-bottom: env(safe-area-inset-bottom, 0px);
+      border-top: 1px solid var(--border2);
+      border-radius: 16px 16px 0 0;
+      transform: translateY(100%);
+      transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+      box-shadow: 0 -12px 40px rgba(0,0,0,0.6);
+    }
+
+    .sidebar.open {
+      transform: translateY(0);
+    }
+
+    /* Show close button on mobile */
+    .sb-close { display: flex; }
+
+    /* Drag handle */
+    .sb-head::before {
+      content: '';
+      display: block;
+      position: absolute;
+      top: 8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 32px; height: 3px;
+      background: var(--border2);
+      border-radius: 2px;
+    }
+
+    .sb-head { position: relative; padding-top: 18px; }
+
+    /* Overlay behind drawer */
+    .overlay {
+      display: block;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+
+    .overlay.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* Larger grid buttons for touch */
+    .q-grid {
+      grid-template-columns: repeat(6, 1fr);
+      gap: 8px;
+      padding: 12px 14px;
+    }
+
+    .qb { font-size: 12px; border-radius: 6px; }
+
+    .legend { padding: 8px 14px; gap: 4px 8px; }
+  }
+
+  /* ═══════════════════════════════════════
+     TABLET  (701px – 1024px)
+  ═══════════════════════════════════════ */
+  @media (min-width: 701px) and (max-width: 1024px) {
+    .layout { grid-template-columns: 1fr 220px; }
+    .q-scroll { padding: 24px 28px 16px; }
+    .q-footer { padding: 12px 24px; }
+  }
+
+  /* overlay (behind mobile drawer) */
+  .overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.55);
+    z-index: 99;
+    backdrop-filter: blur(2px);
+  }
+</style>
+</head>
+<body>
+
+<!-- overlay for mobile drawer -->
+<div class="overlay" id="overlay" onclick="closeNav()"></div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <span class="neet-pill">NEET UG</span>
+    <span class="exam-title">Biotechnology &amp; Its Applications <span class="sub">· Ch. 10</span></span>
+  </div>
+  <div class="header-right">
+    <span id="timer">45:00</span>
+    <div class="nav-toggle" onclick="openNav()" title="Question Navigator">
+      <span></span><span></span><span></span>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN LAYOUT -->
+<div class="layout">
+
+  <!-- QUESTION PANEL -->
+  <div class="q-panel">
+    <div class="q-scroll">
+      <div class="q-meta">
+        <span class="q-counter" id="q-label">Question 1 of 30</span>
+        <span class="dot">·</span>
+        <span class="mark-tag mark-pos">+4</span>
+        <span class="mark-tag mark-neg">−1</span>
+      </div>
+      <div class="q-text" id="q-text"></div>
+      <div class="options-list" id="options-list"></div>
+      <div class="exp-box" id="exp-box"></div>
+    </div>
+
+    <div class="q-footer">
+      <button class="btn btn-ghost" onclick="navigate(-1)">← Prev</button>
+      <button class="btn btn-amber" onclick="skipQuestion()">Skip</button>
+      <button class="btn btn-blue" onclick="navigate(1)">Next →</button>
+      <div class="spacer"></div>
+      <button class="btn btn-submit" onclick="submitTest()">Submit</button>
+    </div>
+  </div>
+
+  <!-- SIDEBAR / DRAWER -->
+  <div class="sidebar" id="sidebar">
+    <div class="sb-head">
+      <span class="sb-title">Navigator</span>
+      <div class="sb-close" onclick="closeNav()">✕</div>
+    </div>
+    <div class="legend">
+      <div class="leg-item"><div class="leg-dot ld-green"></div>Answered</div>
+      <div class="leg-item"><div class="leg-dot ld-amber"></div>Skipped</div>
+      <div class="leg-item"><div class="leg-dot ld-blue"></div>Current</div>
+      <div class="leg-item"><div class="leg-dot ld-muted"></div>Pending</div>
+    </div>
+    <div class="q-grid" id="q-grid"></div>
+    <div class="sb-stats">
+      <div class="stat"><div class="stat-val sv-green" id="cnt-a">0</div><div class="stat-lbl">Done</div></div>
+      <div class="stat"><div class="stat-val sv-amber" id="cnt-s">0</div><div class="stat-lbl">Skipped</div></div>
+      <div class="stat"><div class="stat-val sv-blue"  id="cnt-r">30</div><div class="stat-lbl">Left</div></div>
+    </div>
+  </div>
+
+</div>
+
+<!-- RESULT SCREEN -->
+<div id="result-screen">
+  <div class="res-wrap">
+    <div class="res-top">
+      <div class="res-eyebrow">Test Complete · Biotechnology Ch. 10</div>
+      <div class="res-score-big" id="res-score">0</div>
+      <div class="res-score-label">out of 120 marks</div>
+    </div>
+    <div class="res-cards">
+      <div class="res-card"><div class="rc-val rc-green" id="res-c">0</div><div class="rc-lbl">Correct</div></div>
+      <div class="res-card"><div class="rc-val rc-red"   id="res-w">0</div><div class="rc-lbl">Wrong</div></div>
+      <div class="res-card"><div class="rc-val rc-amber" id="res-s">0</div><div class="rc-lbl">Skipped</div></div>
+    </div>
+    <div class="res-sol-title">Detailed Solutions</div>
+    <div id="sol-list"></div>
+    <button class="btn-restart" onclick="restartTest()">↺ Restart Test</button>
+  </div>
+</div>
+
+<script>
+const questions = [
+  { q:"Biotechnology essentially deals with industrial scale production of biopharmaceuticals using genetically modified organisms. Which of the following is NOT listed as an application of biotechnology?", opts:["Therapeutics","Bioremediation","Space exploration","Energy production"], ans:2, exp:"Applications of biotechnology include therapeutics, diagnostics, GM crops, processed food, bioremediation, waste treatment, and energy production. Space exploration is not mentioned." },
+  { q:"Which of the following is NOT a critical research area of biotechnology?", opts:["Providing the best catalyst in the form of improved organism","Creating optimal conditions through engineering for a catalyst to act","Development of nuclear reactors","Downstream processing technologies to purify the protein/organic compound"], ans:2, exp:"The three critical research areas are: providing improved organism/enzyme as catalyst, creating optimal conditions for catalyst, and downstream processing to purify the product." },
+  { q:"The Green Revolution succeeded in tripling the food supply. Increased yields were MAINLY due to:", opts:["Use of improved crop varieties only","Use of better management practices and agrochemicals","Genetic engineering techniques","Tissue culture methods"], ans:1, exp:"Increased yields have partly been due to improved crop varieties, but MAINLY due to better management practices and use of agrochemicals (fertilisers and pesticides)." },
+  { q:"The capacity to generate a whole plant from any cell or explant is called:", opts:["Totipotency","Micro-propagation","Somatic hybridisation","Somacloning"], ans:0, exp:"Totipotency is defined as the capacity to generate a whole plant from any cell/explant. This was learnt by scientists in the 1950s." },
+  { q:"Plants produced through tissue culture that are genetically identical to the original plant are called:", opts:["Transgenic plants","Somatic hybrids","Somaclones","Explants"], ans:2, exp:"Plants produced through micro-propagation that are genetically identical to the original plant are called somaclones." },
+  { q:"The method of producing thousands of plants through tissue culture is called:", opts:["Somatic hybridisation","Micro-propagation","Totipotency","Recombinant technology"], ans:1, exp:"Micro-propagation is the method of producing thousands of plants through tissue culture in a very short duration." },
+  { q:"Which part of a virus-infected plant is free from virus and can be grown in vitro to obtain virus-free plants?", opts:["Root tip","Leaf mesophyll","Meristem (apical and axillary)","Stem cortex"], ans:2, exp:"Even if a plant is infected with a virus, the meristem (apical and axillary) is free of virus. It can be removed and grown in vitro to obtain virus-free plants." },
+  { q:"In somatic hybridisation, protoplasts are isolated from plants by:", opts:["Mechanical crushing","Digesting cell walls","Enzymatic digestion of plasma membrane","Freeze-fracturing"], ans:1, exp:"Scientists isolate naked protoplasts by digesting the cell walls of single cells isolated from plants. These protoplasts are surrounded only by plasma membranes." },
+  { q:"The hybrid plant 'Pomato' was produced by fusion of protoplasts of:", opts:["Potato and tomato","Tomato and brinjal","Potato and brinjal","Tomato and pepper"], ans:0, exp:"Pomato was produced when a protoplast of tomato was fused with that of potato. Unfortunately, this plant did not have all desired characteristics for commercial utilisation." },
+  { q:"Organisms whose genes have been altered by manipulation are called:", opts:["Transgenic organisms only","Somatic hybrids","Genetically Modified Organisms (GMO)","Somaclones"], ans:2, exp:"Plants, bacteria, fungi and animals whose genes have been altered by manipulation are called Genetically Modified Organisms (GMO)." },
+  { q:"Golden rice is a GM crop with enhanced nutritional value due to enrichment with:", opts:["Vitamin C","Vitamin D","Vitamin A","Vitamin B12"], ans:2, exp:"Golden rice is Vitamin A enriched rice — an example of a GM crop with enhanced nutritional value of food." },
+  { q:"Bt toxin is produced by which bacterium?", opts:["Bacillus subtilis","Bacillus anthracis","Bacillus thuringiensis","Bacillus cereus"], ans:2, exp:"Bt toxin is produced by Bacillus thuringiensis (Bt for short). Its toxin gene has been cloned and expressed in plants to create bio-pesticides." },
+  { q:"The Bt toxin protein exists as inactive protoxins. It is converted into an active form due to:", opts:["Acidic pH of insect gut","Alkaline pH of insect gut","Neutral pH in the bacterium","High temperature in the insect body"], ans:1, exp:"Once an insect ingests the inactive toxin, it is converted into an active form due to the alkaline pH of the gut, which solubilises the crystals." },
+  { q:"The genes cryIAc and cryIIAb control which pest in Bt cotton?", opts:["Corn borer","Cotton bollworms","Armyworm","Fruit fly"], ans:1, exp:"The proteins encoded by cryIAc and cryIIAb control the cotton bollworms, while cryIAb controls corn borer." },
+  { q:"RNA interference (RNAi) was used as a strategy to protect tobacco plants against which nematode?", opts:["Caenorhabditis elegans","Meloidegyne incognitia","Ascaris lumbricoides","Wuchereria bancrofti"], ans:1, exp:"Meloidegyne incognitia infects the roots of tobacco plants causing great reduction in yield. RNAi was adopted to prevent this infestation." },
+  { q:"In the RNAi strategy against nematodes, dsRNA causes:", opts:["Degrading the nematode's DNA","Preventing translation of nematode mRNA","Inhibiting transcription in the plant","Blocking the nematode's respiratory enzymes"], ans:1, exp:"RNAi involves silencing of a specific mRNA by a complementary dsRNA molecule that binds to and prevents translation of the mRNA." },
+  { q:"Which vector was used to introduce nematode-specific genes into host plants for RNAi-based protection?", opts:["Retroviral vector","Agrobacterium vector","Bacteriophage vector","Plasmid vector"], ans:1, exp:"Agrobacterium vectors were used to introduce nematode-specific genes into the host plant, producing both sense and anti-sense RNA in host cells." },
+  { q:"Recombinant therapeutics do not induce unwanted immunological responses because:", opts:["They are produced in large quantities","They are identical to human proteins","They are cheaper to produce","They are produced from non-human sources"], ans:1, exp:"Recombinant therapeutics are identical to human proteins and therefore do not induce unwanted immunological responses as is common with products isolated from non-human sources." },
+  { q:"Insulin used for diabetes was earlier extracted from:", opts:["Pancreas of slaughtered cattle and pigs","Liver of sheep","Genetically modified bacteria","Blood of human donors"], ans:0, exp:"Insulin used for diabetes was earlier extracted from the pancreas of slaughtered cattle and pigs, which sometimes caused allergic reactions in patients." },
+  { q:"Insulin consists of two short polypeptide chains linked by:", opts:["Peptide bonds","Hydrogen bonds","Disulphide bridges","Ionic bonds"], ans:2, exp:"Insulin consists of two short polypeptide chains: chain A and chain B, linked together by disulphide bridges." },
+  { q:"The C peptide in pro-insulin is:", opts:["Present in mature insulin","Removed during maturation into insulin","Responsible for insulin's biological activity","Added during maturation of insulin"], ans:1, exp:"The C peptide is not present in mature insulin and is removed during maturation. Eli Lilly produced insulin chains A and B separately in E. coli and combined them in 1983." },
+  { q:"The first clinical gene therapy in 1990 was given to a 4-year old girl with deficiency of which enzyme?", opts:["Hexosaminidase A","Phenylalanine hydroxylase","Adenosine deaminase (ADA)","Alpha-1-antitrypsin"], ans:2, exp:"The first clinical gene therapy was given in 1990 to a 4-year old girl with adenosine deaminase (ADA) deficiency. This enzyme is crucial for immune system function." },
+  { q:"In gene therapy for ADA deficiency, the functional ADA cDNA is introduced into lymphocytes using:", opts:["Agrobacterium vector","Retroviral vector","Adenoviral vector","Bacteriophage vector"], ans:1, exp:"A functional ADA cDNA using a retroviral vector is introduced into lymphocytes cultured from the patient's blood, which are then returned to the patient." },
+  { q:"Which technique detects very low concentrations of a pathogen even before symptoms appear?", opts:["ELISA","Western blotting","PCR (Polymerase Chain Reaction)","Southern blotting"], ans:2, exp:"Very low concentration of a bacteria or virus can be detected by amplification of their nucleic acid by PCR. It is routinely used to detect HIV in suspected AIDS patients." },
+  { q:"ELISA is based on the principle of:", opts:["Nucleic acid hybridisation","Antigen-antibody interaction","PCR amplification","Gel electrophoresis"], ans:1, exp:"ELISA (Enzyme Linked Immuno-sorbent Assay) is based on antigen-antibody interaction. Infection can be detected by the presence of antigens or antibodies against the pathogen." },
+  { q:"Over 95% of all existing transgenic animals are:", opts:["Rats","Rabbits","Pigs","Mice"], ans:3, exp:"Although transgenic rats, rabbits, pigs, sheep, cows and fish have been produced, over 95 per cent of all existing transgenic animals are mice." },
+  { q:"The first transgenic cow 'Rosie' (1997) produced human protein-enriched milk containing:", opts:["Alpha-1-antitrypsin","Human alpha-lactalbumin","Insulin","ADA enzyme"], ans:1, exp:"Rosie produced milk (2.4 g/litre) containing human alpha-lactalbumin — a nutritionally more balanced product for human babies than natural cow milk." },
+  { q:"Transgenic mice are being developed to test safety of which vaccine, potentially replacing monkeys?", opts:["Smallpox vaccine","MMR vaccine","Polio vaccine","Rabies vaccine"], ans:2, exp:"Transgenic mice are being used to test the safety of the polio vaccine. If successful, they could replace the use of monkeys to test vaccine batches." },
+  { q:"GEAC (Genetic Engineering Approval Committee) was set up by:", opts:["WHO","United Nations","Indian Government","CSIR"], ans:2, exp:"The Indian Government set up GEAC to make decisions regarding the validity of GM research and the safety of introducing GM-organisms for public services." },
+  { q:"Biopiracy refers to:", opts:["Theft of biological specimens from forests","Use of bio-resources without proper authorisation and compensatory payment","Illegal trade of animals and plants","Patenting of naturally occurring organisms"], ans:1, exp:"Biopiracy is the use of bio-resources by multinational companies and other organisations without proper authorisation from the countries and people concerned, without compensatory payment." }
+];
+
+const KEYS = ['A','B','C','D'];
+let cur = 0;
+let ans = new Array(questions.length).fill(-1);
+let skp = new Array(questions.length).fill(false);
+let sec = 45 * 60;
+let submitted = false;
+let timerID;
+
+function init() {
+  buildGrid();
+  render(0);
+  timerID = setInterval(tick, 1000);
+}
+
+function tick() {
+  sec--;
+  const m = Math.floor(sec/60), s = sec%60;
+  const el = document.getElementById('timer');
+  el.textContent = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+  el.className = sec<=60 ? 'danger' : sec<=300 ? 'warn' : '';
+  if (sec <= 0) { clearInterval(timerID); submitTest(); }
+}
+
+function render(i) {
+  cur = i;
+  const q = questions[i];
+  document.getElementById('q-label').textContent = `Question ${i+1} of ${questions.length}`;
+  document.getElementById('q-text').innerHTML =
+    `<span style="color:var(--text3);font-size:11px;font-weight:500;margin-right:8px;">Q${i+1}</span>${q.q}`;
+
+  const list = document.getElementById('options-list');
+  list.innerHTML = '';
+  q.opts.forEach((o, oi) => {
+    const d = document.createElement('div');
+    d.className = 'opt' + (ans[i]===oi ? ' selected' : '');
+    d.innerHTML = `<div class="opt-key">${KEYS[oi]}</div><div class="opt-text">${o}</div>`;
+    if (!submitted) d.onclick = () => pick(i, oi);
+    list.appendChild(d);
+  });
+
+  document.getElementById('exp-box').className = 'exp-box';
+  syncGrid();
+  syncStats();
+}
+
+function pick(qi, oi) {
+  if (submitted) return;
+  ans[qi] = oi;
+  skp[qi] = false;
+  render(qi);
+}
+
+function skipQuestion() {
+  if (submitted) return;
+  skp[cur] = true;
+  navigate(1);
+}
+
+function navigate(d) {
+  const n = cur + d;
+  if (n >= 0 && n < questions.length) render(n);
+}
+
+function syncGrid() {
+  document.querySelectorAll('.qb').forEach((b, i) => {
+    b.className = 'qb';
+    if (i === cur) b.classList.add('current');
+    else if (!skp[i] && ans[i] !== -1) b.classList.add('answered');
+    else if (skp[i]) b.classList.add('skipped');
+  });
+}
+
+function syncStats() {
+  const a = ans.filter((v,i) => v !== -1 && !skp[i]).length;
+  const s = skp.filter(Boolean).length;
+  document.getElementById('cnt-a').textContent = a;
+  document.getElementById('cnt-s').textContent = s;
+  document.getElementById('cnt-r').textContent = Math.max(0, questions.length - a - s);
+}
+
+function buildGrid() {
+  const g = document.getElementById('q-grid');
+  g.innerHTML = '';
+  questions.forEach((_, i) => {
+    const b = document.createElement('button');
+    b.className = 'qb';
+    b.textContent = i+1;
+    b.onclick = () => { render(i); closeNav(); };
+    g.appendChild(b);
+  });
+}
+
+function openNav() {
+  document.getElementById('sidebar').classList.add('open');
+  document.getElementById('overlay').classList.add('show');
+}
+
+function closeNav() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('overlay').classList.remove('show');
+}
+
+function submitTest() {
+  if (submitted) return;
+  submitted = true;
+  clearInterval(timerID);
+  closeNav();
+
+  let correct=0, wrong=0, skip=0;
+  questions.forEach((q,i) => {
+    if (ans[i]===-1 || skp[i]) skip++;
+    else if (ans[i]===q.ans) correct++;
+    else wrong++;
+  });
+  const score = correct*4 - wrong;
+
+  document.getElementById('res-score').textContent = score;
+  document.getElementById('res-c').textContent = correct;
+  document.getElementById('res-w').textContent = wrong;
+  document.getElementById('res-s').textContent = skip;
+
+  const sol = document.getElementById('sol-list');
+  sol.innerHTML = '';
+  questions.forEach((q,i) => {
+    const ua = ans[i];
+    const isSkip = skp[i] || ua===-1;
+    const isRight = !isSkip && ua===q.ans;
+    const div = document.createElement('div');
+    div.className = `sol-item ${isSkip?'ss':isRight?'sc':'sw'}`;
+    let tags = `<span class="stag stag-c">Correct: ${KEYS[q.ans]}. ${q.opts[q.ans]}</span>`;
+    if (!isSkip && !isRight) tags = `<span class="stag stag-w">Your answer: ${KEYS[ua]}. ${q.opts[ua]}</span>` + tags;
+    if (isSkip) tags = `<span class="stag stag-s">Not attempted</span>` + tags;
+    div.innerHTML = `
+      <div class="sol-num">Q${i+1} · ${isSkip ? '— Skipped' : isRight ? '✓ Correct +4' : '✗ Wrong −1'}</div>
+      <div class="sol-qtext">${q.q}</div>
+      <div class="sol-tags">${tags}</div>
+      <div class="sol-exp">${q.exp}</div>
+    `;
+    sol.appendChild(div);
+  });
+
+  document.getElementById('result-screen').style.display = 'block';
+  document.getElementById('result-screen').scrollTop = 0;
+}
+
+function restartTest() {
+  submitted = false;
+  ans = new Array(questions.length).fill(-1);
+  skp = new Array(questions.length).fill(false);
+  sec = 45*60;
+  cur = 0;
+  document.getElementById('result-screen').style.display = 'none';
+  document.getElementById('timer').textContent = '45:00';
+  document.getElementById('timer').className = '';
+  buildGrid();
+  render(0);
+  timerID = setInterval(tick, 1000);
+}
+
+init();
+</script>
+</body>
+</html>
